@@ -56,6 +56,27 @@ expression:
 raw_expression:
 | i = INT_CONST
    { EConst (ConstInt i) }
+| e0 = expression AND e1 = expression
+   { EBinOp (OpAnd, e0, e1) }
+| e0 = expression LT e1 = expression
+   { EBinOp (OpLt, e0, e1) }
+| e0 = expression PLUS e1 = expression
+   { EBinOp (OpAdd, e0, e1) }
+| e0 = expression MINUS e1 = expression
+   { EBinOp (OpSub, e0, e1) }
+| e0 = expression TIMES e1 = expression
+   { EBinOp (OpMul, e0, e1) }
+| e0 = expression LBRACKET e1 = expression RBRACKET
+   { EArrayGet (e0, e1) }
+| e0 = expression DOT LENGTH { EArrayLength e0 }
+| e0 = expression DOT c = IDENT LPAREN ll = separated_list(COMMA, expression) RPAREN { EMethodCall (e0, c, ll) }
+| b = BOOL_CONST { EConst (ConstBool b) } 
+| id = IDENT { EGetVar id }
+| THIS { EThis }
+| NEW i = INTEGER LBRACKET e = expression RBRACKET { EArrayAlloc e }
+| NEW id = IDENT LPAREN RPAREN { EObjectAlloc id }
+| NOT e = expression { EUnOp (UOpNot,e) }
+
 
 instruction:
 | LBRACE li = instruction* RBRACE { IBlock li }

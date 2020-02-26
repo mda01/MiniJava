@@ -52,6 +52,7 @@ expression:
 | LPAREN e = expression RPAREN
    { e }
 
+
 raw_expression:
 | i = INT_CONST
    { EConst (ConstInt i) }
@@ -59,13 +60,16 @@ raw_expression:
 instruction:
 | LBRACE li = instruction* RBRACE { IBlock li }
 | IF LPAREN e = expression RPAREN i1 = instruction ELSE i2 = instruction
-{ IIf (e,i1,i2) }
+   { IIf (e,i1,i2) }
 | WHILE LPAREN e = expression RPAREN i = instruction
-{ IWhile (e, i) }
+   { IWhile (e, i) }
 
 | SYSO LPAREN e =
    expression
    RPAREN
    SEMICOLON
    { ISyso e }
-
+| id = IDENT LBRACKET e = expression RBRACKET ASSIGN ee = expression SEMICOLON
+   { IArraySet (id, e, ee) }
+| id = IDENT ASSIGN e = expression SEMICOLON
+   { ISetVar (id, e) }

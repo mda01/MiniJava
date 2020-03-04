@@ -24,16 +24,20 @@
 %%
 
 program:
-| m = main_class /*d = defs */EOF
+| m = main_class d = defs EOF
    {
      let c, a, i = m in
      {
        name = c;
-       defs = [];
+       defs = d;
        main_args = a;
        main = i
      }
    }
+
+defs:
+ll = class_declaration* {ll}
+
 
 main_class:
 | CLASS c = IDENT
@@ -45,6 +49,24 @@ main_class:
    RBRACE
    { (c, a, i) }
 
+class_declaration:
+| CLASS c = IDENT id = option(preceded(EXTENDS, IDENT)) LBRACE 
+var = list(pair(typi, terminated(IDENT, SEMICOLON)))
+me = list(method_declaration)
+RBRACE
+{ clas(id, var, me) }
+
+method_declaration:
+| PUBLIC t = typi IDENT LPAREN 
+varDec = option(separated_list(COMMA, pair(typi, IDENT))) 
+RPAREN LBRACE
+varList = list(pair(typi, terminated(IDENT, SEMICOLON)))
+body = list(instruction)
+RETURN e = expression SEMICOLON RBRACE
+{
+   formals = varDec; (* Inverser Identifiant et types*)
+
+}
 
 expression:
 |  e = raw_expression
@@ -95,13 +117,8 @@ instruction:
 | id = IDENT ASSIGN e = expression SEMICOLON
    { ISetVar (id, e) }
 
-typ:
+typi:
 | INT_CONST { TypInt }
 | INT_CONST LBRACKET RBRACKET { TypIntArray}
 | BOOL_CONST { TypBool }
 | id = IDENT { Typ id }
-
-(*
-var_declaration:
-| t = typ i = INDENT SEMICOLON { }
-*)

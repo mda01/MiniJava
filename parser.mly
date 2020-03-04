@@ -94,3 +94,14 @@ instruction:
    { IArraySet (id, e, ee) }
 | id = IDENT ASSIGN e = expression SEMICOLON
    { ISetVar (id, e) }
+
+typ:
+| INT_CONST { TypInt }
+| INT_CONST LBRACKET RBRACKET { TypIntArray}
+| BOOL_CONST { TypBool }
+| id = IDENT { Typ id }
+
+(*
+var_declaration:
+| t = typ i = INDENT SEMICOLON { }
+*)

@@ -38,7 +38,6 @@ program:
 defs:
 ll = class_declaration* {ll}
 
-
 main_class:
 | CLASS c = IDENT
    LBRACE
@@ -50,22 +49,41 @@ main_class:
    { (c, a, i) }
 
 class_declaration:
-| CLASS c = IDENT id = option(preceded(EXTENDS, IDENT)) LBRACE 
+| CLASS c_id = IDENT ext = option(preceded(EXTENDS, IDENT)) LBRACE 
 var = list(pair(typi, terminated(IDENT, SEMICOLON)))
 me = list(method_declaration)
-RBRACE
-{ clas(id, var, me) }
+RBRACE 
+{
+   (* Return a list of pairs (id*typ) from menhir list *)
+   let rec formatvar vars acc = match vars with
+         | [] -> acc
+         | head :: tail -> let typ, id = head in (id, typ)::(formatvar tail acc)
+         in (c_id, {
+            extends = ext;
+            attributes = formatvar var []; 
+            methods = me;
+         })
+}
 
 method_declaration:
-| PUBLIC t = typi IDENT LPAREN 
-varDec = option(separated_list(COMMA, pair(typi, IDENT))) 
+| PUBLIC t = typi id = IDENT LPAREN 
+varDec = separated_list(COMMA, pair(typi, IDENT)) 
 RPAREN LBRACE
 varList = list(pair(typi, terminated(IDENT, SEMICOLON)))
-body = list(instruction)
+methoBody = list(instruction)
 RETURN e = expression SEMICOLON RBRACE
 {
-   formals = varDec; (* Inverser Identifiant et types*)
-
+   (* Return a list of pairs (id*typ) from menhir list *)
+   let rec formatvar vars acc = match vars with
+         | [] -> acc
+         | head :: tail -> let typ, id = head in (id, typ)::(formatvar tail acc)
+         in (id, {
+            formals = formatvar varDec [];
+            result = t;
+            locals = formatvar varList [];
+            body = methoBody;
+            return = e;
+         })
 }
 
 expression:

@@ -21,6 +21,15 @@
 
 %type <LMJ.program> program
 
+%nonassoc NOT 
+%nonassoc LT
+%nonassoc LBRACKET
+%nonassoc DOT
+%nonassoc IDENT
+%left AND
+%left PLUS MINUS
+%left TIMES
+
 %%
 
 program:
@@ -50,8 +59,8 @@ main_class:
 
 class_declaration:
 | CLASS c_id = IDENT ext = option(preceded(EXTENDS, IDENT)) LBRACE 
-var = list(pair(typi, terminated(IDENT, SEMICOLON)))
-me = list(method_declaration)
+varList = list(pair(typi, terminated(IDENT, SEMICOLON)))
+metho = list(method_declaration)
 RBRACE 
 {
    (* Return a list of pairs (id*typ) from menhir list *)
@@ -60,28 +69,36 @@ RBRACE
          | head :: tail -> let typ, id = head in (id, typ)::(formatvar tail acc)
          in (c_id, {
             extends = ext;
-            attributes = formatvar var []; 
-            methods = me;
+            attributes = formatvar varList []; 
+            methods = metho;
          })
 }
+
+decl_inst:
+| var = pair(typi,terminated(IDENT, SEMICOLON)) met = decl_inst { 
+   let varL, insL = met in (var::varL, insL) (*Extract varlist and instruction list, then append current var to the varlist*)
+}
+| me = list(instruction) { ([], me) } (*Initialisation of the pair of list with varlist empty*)
 
 method_declaration:
 | PUBLIC t = typi id = IDENT LPAREN 
 varDec = separated_list(COMMA, pair(typi, IDENT)) 
 RPAREN LBRACE
-varList = list(pair(typi, terminated(IDENT, SEMICOLON)))
-methoBody = list(instruction)
+di = decl_inst
 RETURN e = expression SEMICOLON RBRACE
 {
    (* Return a list of pairs (id*typ) from menhir list *)
    let rec formatvar vars acc = match vars with
          | [] -> acc
          | head :: tail -> let typ, id = head in (id, typ)::(formatvar tail acc)
-         in (id, {
+   in 
+      match di with
+      | (varList, insList) ->  
+      (id, {
             formals = formatvar varDec [];
             result = t;
-            locals = formatvar varList [];
-            body = methoBody;
+            locals = varList;
+            body = insList;
             return = e;
          })
 }

@@ -21,11 +21,9 @@
 
 %type <LMJ.program> program
 
-%nonassoc NOT 
-%nonassoc LT
-%nonassoc LBRACKET
-%nonassoc DOT
+%nonassoc NOT
 %left AND
+%nonassoc LT
 %left PLUS MINUS
 %left TIMES
 

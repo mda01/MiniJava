@@ -92,12 +92,11 @@ RETURN e = expression SEMICOLON RBRACE
          | [] -> acc
          | head :: tail -> let typ, id = head in (id, typ)::(formatvar tail acc)
    in 
-      match di with
-      | (varList, insList) ->  
+      let varList, insList = di in  
       (id, {
             formals = formatvar varDec [];
             result = t;
-            locals = varList;
+            locals = formatvar varList [];
             body = insList;
             return = e;
          })

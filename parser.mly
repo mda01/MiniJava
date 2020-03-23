@@ -25,7 +25,6 @@
 %nonassoc LT
 %nonassoc LBRACKET
 %nonassoc DOT
-%nonassoc IDENT
 %left AND
 %left PLUS MINUS
 %left TIMES
@@ -129,7 +128,7 @@ raw_expression:
 | b = BOOL_CONST { EConst (ConstBool b) } 
 | id = IDENT { EGetVar id }
 | THIS { EThis }
-| NEW i = INTEGER LBRACKET e = expression RBRACKET { EArrayAlloc e }
+| NEW INTEGER LBRACKET e = expression RBRACKET { EArrayAlloc e }
 | NEW id = IDENT LPAREN RPAREN { EObjectAlloc id }
 | NOT e = expression { EUnOp (UOpNot,e) }
 
@@ -152,7 +151,7 @@ instruction:
    { ISetVar (id, e) }
 
 typi:
-| INT_CONST { TypInt }
-| INT_CONST LBRACKET RBRACKET { TypIntArray}
-| BOOL_CONST { TypBool }
+| INTEGER { TypInt }
+| INTEGER LBRACKET RBRACKET { TypIntArray}
+| BOOLEAN { TypBool }
 | id = IDENT { Typ id }

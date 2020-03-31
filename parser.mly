@@ -7,9 +7,9 @@
 %token INTEGER BOOLEAN
 %token <string Location.t> IDENT
 %token CLASS PUBLIC STATIC VOID MAIN STRING EXTENDS RETURN
-%token PLUS MINUS TIMES NOT LT AND
+%token PLUS MINUS TIMES NOT LT GT LEQ GEQ AND OR
 %token COMMA SEMICOLON
-%token ASSIGN
+%token ASSIGN EQUAL NEQUAL
 %token LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 %token THIS NEW DOT LENGTH
 %token SYSO
@@ -22,8 +22,9 @@
 %type <LMJ.program> program
 
 %nonassoc NOT
-%left AND
-%nonassoc LT
+%left AND 
+%left OR
+%nonassoc LT GT LEQ GEQ EQUAL NEQUAL
 %left PLUS MINUS
 %left TIMES
 
@@ -109,10 +110,24 @@ expression:
 raw_expression:
 | i = INT_CONST
    { EConst (ConstInt i) }
-| e0 = expression AND e1 = expression
-   { EBinOp (OpAnd, e0, e1) }
-| e0 = expression LT e1 = expression
-   { EBinOp (OpLt, e0, e1) }
+| e0 = expression AND e1 = expression     { EBinOp (OpAnd, e0, e1) }
+| e0 = expression OR e1 = expression      
+   { 
+      EUnOp(UOpNot, (Location.make $startpos $endpos (
+         EBinOp (OpAnd, 
+            (Location.make $startpos $endpos (EUnOp (UOpNot,e0))),
+            (Location.make $startpos $endpos (EUnOp (UOpNot,e1))))
+         ))) 
+   }
+| e0 = expression EQUAL e1 = expression   { EBinOp (OpEq, e0, e1)}
+| e0 = expression NEQUAL e1 = expression  { EUnOp(UOpNot, (Location.make $startpos $endpos (EBinOp (OpEq, e0, e1)))) }
+/* Operations >, <, >= and <= */
+| e0 = expression LT e1 = expression   { EBinOp (OpLt, e0, e1) }
+| e0 = expression GT e1 = expression   { EBinOp (OpGt, e0, e1) }
+| e0 = expression LEQ e1 = expression  { EUnOp(UOpNot, (Location.make $startpos $endpos (EBinOp (OpGt, e0, e1)))) }
+| e0 = expression GEQ e1 = expression  { EUnOp(UOpNot, (Location.make $startpos $endpos (EBinOp (OpLt, e0, e1)))) }
+   
+/* Math Operations */
 | e0 = expression PLUS e1 = expression
    { EBinOp (OpAdd, e0, e1) }
 | e0 = expression MINUS e1 = expression
@@ -130,18 +145,13 @@ raw_expression:
 | NEW id = IDENT LPAREN RPAREN { EObjectAlloc id }
 | NOT e = expression { EUnOp (UOpNot,e) }
 
-
 instruction:
 | LBRACE li = instruction* RBRACE { IBlock li }
 | IF LPAREN e = expression RPAREN i1 = instruction ELSE i2 = instruction
    { IIf (e,i1,i2) }
 | WHILE LPAREN e = expression RPAREN i = instruction
    { IWhile (e, i) }
-
-| SYSO LPAREN e =
-   expression
-   RPAREN
-   SEMICOLON
+| SYSO LPAREN e = expression RPAREN SEMICOLON
    { ISyso e }
 | id = IDENT LBRACKET e = expression RBRACKET ASSIGN ee = expression SEMICOLON
    { IArraySet (id, e, ee) }

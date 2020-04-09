@@ -34,6 +34,7 @@ and instruction =
   | IBlock of instruction list
   | IIf of expression * instruction * instruction
   | IWhile of expression * instruction
+  | IFor of identifier * expression * expression * expression * instruction
   | ISyso of expression
   | ISetVar of identifier * expression
   (* | ISetVarPlus of identifier * int32

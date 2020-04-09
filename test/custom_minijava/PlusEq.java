@@ -1,4 +1,4 @@
-class PrintTestEqual {
+/* class PrintTestEqual {
     public static void main(String[] a) {
 		System.out.println(new Printer().conditionnalDisplay());
     }
@@ -31,3 +31,4 @@ class Printer {
 		return res;
 	}
 }
+*/

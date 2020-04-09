@@ -18,6 +18,7 @@ and translate_instruction = function
 | LMJ.IBlock is -> MJ.IBlock (List.map translate_instruction is)
 | LMJ.IIf (c, i1, i2) -> MJ.IIf (translate_expression c, translate_instruction i1, translate_instruction i2)
 | LMJ.IWhile (c, i) -> MJ.IWhile (translate_expression c, translate_instruction i)
+| LMJ.IFor (id, init, e, up, i) -> MJ.IFor (Location.content id, translate_expression init, translate_expression e, translate_expression up, translate_instruction i )
 | LMJ.ISyso e -> MJ.ISyso (translate_expression e)
 | LMJ.ISetVar (id, e) -> MJ.ISetVar (Location.content id, translate_expression e)
 (* | LMJ.ISetVarPlus (id, n) -> MJ.ISetVarPlus (Location.content id, translate_expression e)

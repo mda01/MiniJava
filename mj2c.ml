@@ -506,6 +506,19 @@ let instr2c
          (expr2c method_name class_info) c
          instr2c i
 
+    | IFor (id, init, e, up, ins) ->
+        fprintf out "for(%a%c%a %c %a%c %a%c%a) %a"
+          (var2c method_name class_info) id
+          '='
+          (expr2c method_name class_info) init
+          ';'
+          (expr2c method_name class_info) e
+          ';'
+          (var2c method_name class_info) id
+          '='
+          (expr2c method_name class_info) up
+          instr2c ins
+
     | IBlock is ->
        fprintf out "{%a%t}"
          (indent indentation (sep_list nl instr2c)) is

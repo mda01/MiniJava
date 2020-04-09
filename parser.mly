@@ -14,7 +14,7 @@
 %token LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 %token THIS NEW DOT LENGTH
 %token SYSO
-%token IF ELSE WHILE
+%token IF ELSE WHILE FOR
 %token EOF
 
 
@@ -152,6 +152,13 @@ instruction:
    { IIf (e,i1,i2) }
 | WHILE LPAREN e = expression RPAREN i = instruction
    { IWhile (e, i) }
+/* for(i=0; i < 6; i+1)  |  for(id = val_init ; stop_cond ; val_update)  */
+| FOR LPAREN id = IDENT ASSIGN 
+  init = expression SEMICOLON
+  e = expression SEMICOLON
+  up = expression RPAREN 
+  ins = instruction
+   { IFor (id, init, e, up, ins) }
 | SYSO LPAREN e = expression RPAREN SEMICOLON
    { ISyso e }
 | id = IDENT LBRACKET e = expression RBRACKET ASSIGN ee = expression SEMICOLON

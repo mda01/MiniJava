@@ -10,6 +10,7 @@
 %token PLUS MINUS TIMES NOT LT GT LEQ GEQ AND OR
 %token COMMA SEMICOLON
 %token ASSIGN EQUAL NEQUAL
+/* %token PLUSEQ MINUSEQ */
 %token LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 %token THIS NEW DOT LENGTH
 %token SYSO
@@ -21,9 +22,9 @@
 
 %type <LMJ.program> program
 
+%left OR
 %nonassoc NOT
 %left AND 
-%left OR
 %nonassoc LT GT LEQ GEQ EQUAL NEQUAL
 %left PLUS MINUS
 %left TIMES
@@ -120,12 +121,12 @@ raw_expression:
          ))) 
    }
 | e0 = expression EQUAL e1 = expression   { EBinOp (OpEq, e0, e1)}
-| e0 = expression NEQUAL e1 = expression  { EUnOp(UOpNot, (Location.make $startpos $endpos (EBinOp (OpEq, e0, e1)))) }
+| e0 = expression NEQUAL e1 = expression  { EUnOp (UOpNot, (Location.make $startpos $endpos (EBinOp (OpEq, e0, e1)))) }
 /* Operations >, <, >= and <= */
 | e0 = expression LT e1 = expression   { EBinOp (OpLt, e0, e1) }
 | e0 = expression GT e1 = expression   { EBinOp (OpGt, e0, e1) }
-| e0 = expression LEQ e1 = expression  { EUnOp(UOpNot, (Location.make $startpos $endpos (EBinOp (OpGt, e0, e1)))) }
-| e0 = expression GEQ e1 = expression  { EUnOp(UOpNot, (Location.make $startpos $endpos (EBinOp (OpLt, e0, e1)))) }
+| e0 = expression LEQ e1 = expression  { EUnOp (UOpNot, (Location.make $startpos $endpos (EBinOp (OpGt, e0, e1)))) }
+| e0 = expression GEQ e1 = expression  { EUnOp (UOpNot, (Location.make $startpos $endpos (EBinOp (OpLt, e0, e1)))) }
    
 /* Math Operations */
 | e0 = expression PLUS e1 = expression
@@ -157,6 +158,10 @@ instruction:
    { IArraySet (id, e, ee) }
 | id = IDENT ASSIGN e = expression SEMICOLON
    { ISetVar (id, e) }
+/* | id = IDENT PLUSEQ nb = INT_CONST
+   { ISetVarPlus (id, nb) }
+| id = IDENT MINUSEQ nb = INT_CONST
+   { ISetVarMinus (id, nb) } */
 
 typi:
 | INTEGER { TypInt }

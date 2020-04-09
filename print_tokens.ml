@@ -44,8 +44,12 @@ let print_token show_loc out = function
      fprintf out "RETURN"
   | PLUS ->
      fprintf out "PLUS"
+  (* | PLUSEQ ->
+     fprintf out "PLUSEQ" *)
   | MINUS ->
      fprintf out "MINUS"
+  (* | MINUSEQ ->
+     fprintf out "MINUSEQ" *)
   | TIMES ->
      fprintf out "TIMES"
   | NOT ->

@@ -24,16 +24,9 @@ class Printer {
 
 		p = new Printer();
 		collector = this.init();
-
-		// Addition of operator ==
-		if (number == 42 || number == 5 || number != 4) {
-			if( number < 50 || number == 42 && number == 66 ) {		//Ensure that AND has the priority
-				res = 2;
-			} else {
-				res = 1;
-			}
-		} else {
-			res = 0;
+		res = 0;
+		while(number < 50) {
+			res += 1;
 		}
 		return res;
 	}

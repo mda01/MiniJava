@@ -20,6 +20,8 @@ and translate_instruction = function
 | LMJ.IWhile (c, i) -> MJ.IWhile (translate_expression c, translate_instruction i)
 | LMJ.ISyso e -> MJ.ISyso (translate_expression e)
 | LMJ.ISetVar (id, e) -> MJ.ISetVar (Location.content id, translate_expression e)
+(* | LMJ.ISetVarPlus (id, n) -> MJ.ISetVarPlus (Location.content id, translate_expression e)
+| LMJ.ISetVarMinus (id, n) -> MJ.ISetVarMinus (Location.content id, translate_expression e) *)
 | LMJ.IArraySet (a, e1, e2) -> MJ.IArraySet (Location.content a, translate_expression e1, translate_expression e2)
 
 let translate_typ = function

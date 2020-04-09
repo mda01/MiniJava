@@ -36,6 +36,8 @@ and instruction =
   | IWhile of expression * instruction
   | ISyso of expression
   | ISetVar of identifier * expression
+  (* | ISetVarPlus of identifier * int32
+  | ISetVarMinus of identifier * int32 *)
   | IArraySet of identifier * expression * expression
 
 and typ =

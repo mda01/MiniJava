@@ -43,6 +43,8 @@ and instruction =
   | IWhile of expression * instruction (** [IWile (e, ins)] represents the instruction [while (e) ins]. *)
   | ISyso of expression (** [ISyso e] represents the instruction [System.out.println(e);]. *)
   | ISetVar of identifier * expression (** [ISetVar (id, e)] represents the instruction [id = e;]. *)
+(**  | ISetVarPlus of identifier * int32  (** += *) *)
+(**  | ISetVarMinus of identifier * int32 (** -= *) *)
   | IArraySet of identifier * expression * expression (** [IArraySet (id, e1, e2)] represents the instruction [id[e1] = e2;]. *)
 
 and typ =

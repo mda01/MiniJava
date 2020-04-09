@@ -23,12 +23,13 @@
 %type <LMJ.program> program
 
 %left OR
-%nonassoc NOT
 %left AND 
 %nonassoc LT GT LEQ GEQ EQUAL NEQUAL
 %left PLUS MINUS
 %left TIMES
-
+%nonassoc NOT
+%nonassoc LBRACKET
+%left DOT
 %%
 
 program:
@@ -120,8 +121,10 @@ raw_expression:
             (Location.make $startpos $endpos (EUnOp (UOpNot,e1))))
          ))) 
    }
+/* Tests in ./test/custom_mini-java */
 | e0 = expression EQUAL e1 = expression   { EBinOp (OpEq, e0, e1)}
 | e0 = expression NEQUAL e1 = expression  { EUnOp (UOpNot, (Location.make $startpos $endpos (EBinOp (OpEq, e0, e1)))) }
+/* Tests in ./test/custom_mini-java */
 /* Operations >, <, >= and <= */
 | e0 = expression LT e1 = expression   { EBinOp (OpLt, e0, e1) }
 | e0 = expression GT e1 = expression   { EBinOp (OpGt, e0, e1) }
@@ -152,7 +155,8 @@ instruction:
    { IIf (e,i1,i2) }
 | WHILE LPAREN e = expression RPAREN i = instruction
    { IWhile (e, i) }
-/* for(i=0; i < 6; i+1)  |  for(id = val_init ; stop_cond ; val_update)  */
+/* Tests in ./test/custom_mini-java */
+/* for(i=0; i < 6; i+1)  | Syntax : for(id (ident) = val_init (int_expr) ; stop_cond (bool_expr) ; val_update(int_expr) )  */
 | FOR LPAREN id = IDENT ASSIGN 
   init = expression SEMICOLON
   e = expression SEMICOLON
